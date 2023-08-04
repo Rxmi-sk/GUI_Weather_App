@@ -22,13 +22,46 @@ def get_user_location(city):
     country = location_info["country"]  # Access "country"
     return latitude, longitude, country
 
+def decode_weather_code(wno_code):
+    code_table={
+        "0": "Clear Sky",
+        "1": "Mainly Clear",
+        "2": "Partly Cloudy",
+        "3": "Overcast",
+        "45": "Fog",
+        "48": "Depositing Rime Fog",
+        "51": "Light Drizzle",
+        "53": "Moderate Drizzle",
+        "55": "Dense Intensity Drizzle",
+        "56": "Light Intensity Freezing Drizzle",
+        "57": "Dense Intensity Freezing Drizzle",
+        "61": "Light Intensity  Rain",
+        "63": "Moderate Intensity Rain",
+        "65": "Heavy Intesnity Rain",
+        "66": "Light Freezing Rain",
+        "67": "Heavy Intensity Freezing Rain",
+        "71": "Slight Snow Fall",
+        "73": "Moderate Snow Fall",
+        "75": "Heavy Snow Fall",
+        "77": "Snow Grains",
+        "80": "Slight Rain Showers",
+        "81": "Moderate Rain Showers",
+        "82": "Violent Rain Showers",
+        "85": "Slight Snow Showers",
+        "86": "Heavy Snow Showers",
+        "95": "Thunderstorm",
+        "96": "Thrunderstorm with Hail",
+        "99": "Thunderstrom with Heavy Hail",
+    }
+    
+    return code_table[str(wno_code)]
 
 def main():
 
     # Getting location information from user
     city = input("What city do you live in?\n--> ")
     latitude, longitude, country= get_user_location(city)   # Converting city name to latitude and longitude
-    api_link=f"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&daily=temperature_2m_max,temperature_2m_min,sunrise,sunset&timezone=auto"
+    api_link=f"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&daily=weathercode,temperature_2m_max,temperature_2m_min,sunrise,sunset&timezone=auto"
     # Fetching weather data using user's latitude and longitude
     r = requests.get(api_link)
     status_code = r.status_code # Getting the API's status
@@ -37,6 +70,8 @@ def main():
     if status_code == 200:
        data = r.json()  # Getting the API response as a JSON
        print(city+", "+country)
+       weatherCode = data["daily"]["weathercode"]  # Getting max weekly temperatures from the 'daily' section
+       forecast = weatherCode[0]    # Getting today's max temperature
        max_temps = data["daily"]["temperature_2m_max"]  # Getting max weekly temperatures from the 'daily' section
        todays_max = max_temps[0]    # Getting today's max temperature
        min_temps = data["daily"]["temperature_2m_min"]  # Getting min weekly temperatures from the 'daily' section
@@ -47,7 +82,7 @@ def main():
        sunset = city_sunset[0] 
 
      
-       print(f'High: {todays_max}°C\nLow: {todays_min}°C\nSunrise: {sunrise[-5:]}\nSunset: {sunset[-5:]}') # printing the high and low temps for the day
+       print('Forecast: ' + str(decode_weather_code(forecast))+ f'\nHigh: {todays_max}°C\nLow: {todays_min}°C\nSunrise: {sunrise[-5:]}\nSunset: {sunset[-5:]}') # printing the high and low temps for the day
 
     else:
         print('Failed to fetch metadata.') # prints if the API is not working
