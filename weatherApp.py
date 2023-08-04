@@ -1,23 +1,36 @@
 import requests
+from tkinter import *
 
+# root= Tk()
+# root.title("Weather App")
+# root.geometry("750x400")
+
+# city_name= StringVar()
+# city_input = Entry(root, textvariable=city_name)
+
+# myLabel = Label(root, text="Hello World")
+# myLabel.pack()
+# root.mainloop()
 
 def get_user_location(city):
-    r = requests.get(f'https://geocoding-api.open-meteo.com/v1/search?name={city}&count=1&language=en&format=json')
+    link=f"https://geocoding-api.open-meteo.com/v1/search?name={city}&count=1&language=en&format=json"
+    r = requests.get(link)
     data = r.json()
     location_info = data["results"][0]  # Get the first element from the "results" list
     latitude = location_info["latitude"]  # Access "latitude"
     longitude = location_info["longitude"]  # Access "longitude"
-    return latitude, longitude
+    country = location_info["country"]  # Access "country"
+    return latitude, longitude, country
 
 
 def main():
 
     # Getting location information from user
     city = input("What city do you live in?\n--> ")
-    latitude, longitude = get_user_location(city)   # Converting city name to latitude and longitude
-    
+    latitude, longitude, country= get_user_location(city)   # Converting city name to latitude and longitude
+    api_link=f"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&daily=temperature_2m_max,temperature_2m_min&timezone=GMT"
     # Fetching weather data using user's latitude and longitude
-    r = requests.get(f'https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&daily=temperature_2m_max,temperature_2m_min&timezone=GMT')
+    r = requests.get(api_link)
     status_code = r.status_code # Getting the API's status
     
     # Checking if the API is working
@@ -27,8 +40,11 @@ def main():
        todays_max = max_temps[0]    # Getting today's max temperature
        min_temps = data["daily"]["temperature_2m_min"]  # Getting min weekly temperatures from the 'daily' section
        todays_min = min_temps[0]    # Getting today's min temperature
+    #    sunrise = data["daily"]["sunrise"]
+    #    sunset = data["daily"]["sunset"]
+
      
-       print(f'High: {todays_max}°C\nLow: {todays_min}°C') # printing the high and low temps for the day
+       print(f'High: {todays_max}°C\nLow: {todays_min}°C\nSunrise: {sunrise}\nSunset: {sunset}') # printing the high and low temps for the day
 
     else:
         print('Failed to fetch metadata.') # prints if the API is not working
