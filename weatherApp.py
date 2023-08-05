@@ -1,3 +1,4 @@
+import weather_codes
 import requests
 from tkinter import *
 
@@ -21,41 +22,7 @@ def get_user_location(city):
     longitude = location_info["longitude"]  # Access "longitude"
     country = location_info["country"]  # Access "country"
     return latitude, longitude, country
-
-def decode_weather_code(wno_code):
-    code_table={
-        "0": "Clear Sky",
-        "1": "Mainly Clear",
-        "2": "Partly Cloudy",
-        "3": "Overcast",
-        "45": "Fog",
-        "48": "Depositing Rime Fog",
-        "51": "Light Drizzle",
-        "53": "Moderate Drizzle",
-        "55": "Dense Intensity Drizzle",
-        "56": "Light Intensity Freezing Drizzle",
-        "57": "Dense Intensity Freezing Drizzle",
-        "61": "Light Intensity  Rain",
-        "63": "Moderate Intensity Rain",
-        "65": "Heavy Intesnity Rain",
-        "66": "Light Freezing Rain",
-        "67": "Heavy Intensity Freezing Rain",
-        "71": "Slight Snow Fall",
-        "73": "Moderate Snow Fall",
-        "75": "Heavy Snow Fall",
-        "77": "Snow Grains",
-        "80": "Slight Rain Showers",
-        "81": "Moderate Rain Showers",
-        "82": "Violent Rain Showers",
-        "85": "Slight Snow Showers",
-        "86": "Heavy Snow Showers",
-        "95": "Thunderstorm",
-        "96": "Thrunderstorm with Hail",
-        "99": "Thunderstrom with Heavy Hail",
-    }
     
-    return code_table[str(wno_code)]
-
 def main():
 
     # Getting location information from user
@@ -82,7 +49,7 @@ def main():
        sunset = city_sunset[0] 
 
      
-       print('Forecast: ' + str(decode_weather_code(forecast))+ f'\nHigh: {todays_max}°C\nLow: {todays_min}°C\nSunrise: {sunrise[-5:]}\nSunset: {sunset[-5:]}') # printing the high and low temps for the day
+       print('Forecast: ' + str(weather_codes.decode(forecast))+ f'\nHigh: {todays_max}°C\nLow: {todays_min}°C\nSunrise: {sunrise[-5:]}\nSunset: {sunset[-5:]}') # printing the high and low temps for the day
 
     else:
         print('Failed to fetch metadata.') # prints if the API is not working
@@ -90,3 +57,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+    
